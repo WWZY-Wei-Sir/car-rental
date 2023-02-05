@@ -1,0 +1,39 @@
+spring:
+  thymeleaf:
+    cache: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://81.68.223.21:3915/car_rental ? serverTimezone = Asia/Shanghai
+    username: root
+    password: qpalmZ@901
+  redis:
+    host: 81.68.223.21
+    port: 6379
+    password: qpalmZ@901
+    database: 15
+    lettuce:
+      pool:
+        max-idle: 16
+        max-active: 32
+        min-idle: 8
+  mail:
+    # 配置QQ邮件信息
+    host: smtp.163.com
+    # 发送邮件者信箱
+    username: qwer321951493@163.com
+    # IMAP/SMTP服务时邮箱的密文授权码（之前保存的）
+    password: PLGCKWJRXSSLMTCV
+    port: 465
+    properties:
+      mail:
+        debug: true
+        smtp:
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+
+server:
+  port: 8090
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
