@@ -1,0 +1,86 @@
+$fontFamily: var(--fontFamily, STKaiti);  // 楷体
+$login-font-weight: var(--login-font-weight, bold);
+$register-font-weight: var(--register-font-weight, normal);
+$login-border-bottom-color: var(--login-border-bottom-color, red);
+$register-border-bottom-color: var(--register-border-bottom-color, white);
+
+.entrancePage {
+  position: relative;
+  height: 100vh;
+  background-image: url("../../assets/entranceImage.jpg");
+  //background: linear-gradient(to bottom right, red, pink);
+
+  .entranceLogo {
+    width: 750px;
+    height: 500px;
+    margin: -20px 0 0 640px;
+  }
+
+  .container {
+    position: absolute;
+    margin-top: 20px;
+    width: 370px;
+    height: 400px;
+    left: 50%;
+    top: 50%;
+    transition: all 0.5s;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    opacity: 0.9;
+    border-radius: 0 0 30px 30px;
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.2);
+
+    p {
+      margin: 15px 40px;
+      font-family: $fontFamily;
+      font-size: 25px;
+      cursor: pointer;
+      padding-bottom: 10px;
+    }
+
+    .loginText {
+      font-weight: $login-font-weight;
+      border-bottom: 3px solid $login-border-bottom-color;
+    }
+
+    .registerText {
+      font-weight: $register-font-weight;
+      border-bottom: 3px solid $register-border-bottom-color;
+    }
+
+    .login, .register {
+      overflow: hidden;
+      margin: 20px 0;
+      width: 370px;
+      height: 385px;
+      background-color: white;
+      transition: all 0.5s;
+      border-top: 1px dashed #bbbbbb;
+      border-radius: 0 0 30px 30px;
+    }
+
+    .login {
+      height: 310px;
+
+      .loginForm {
+        margin: 55px 0 0 0;
+
+        .forgetPwd {
+          width: 145px;
+          font-family: serif;
+          font-size: 13px;
+          margin-left: 118px;
+        }
+      }
+    }
+
+    .register {
+      margin: 20px 0;
+
+      .registerForm {
+        margin: 35px 0 0 0;
+      }
+    }
+  }
+}
+
