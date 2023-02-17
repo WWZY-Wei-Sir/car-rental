@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import wsir.carrental.dict.UserStatus;
 import wsir.carrental.dict.UserType;
+import wsir.carrental.entity.basic.LoginDelAndVerObject;
 
 @Data
 @AllArgsConstructor

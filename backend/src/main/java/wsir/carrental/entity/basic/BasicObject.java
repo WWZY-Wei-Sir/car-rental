@@ -1,4 +1,4 @@
-package wsir.carrental.entity;
+package wsir.carrental.entity.basic;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

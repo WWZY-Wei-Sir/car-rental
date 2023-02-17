@@ -3,21 +3,28 @@ package wsir.carrental;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import wsir.carrental.dict.UserStatus;
 import wsir.carrental.dict.UserType;
 import wsir.carrental.entity.User;
 import wsir.carrental.mapper.UserMapper;
+import wsir.carrental.util.JwtUtil;
 
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
 class BackendApplicationTests {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Test
     void contextLoads() {
@@ -46,6 +53,34 @@ class BackendApplicationTests {
         for (User record : iPage.getRecords()) {
             System.out.println(record);
         }
+    }
+
+    @Test
+    void test2() {
+        System.out.println(UUID.randomUUID().toString().replace("-", "="));
+    }
+
+    @Test
+    void test3() throws Exception {
+        LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        userLambdaQueryWrapper.eq(User::getUserName, "hellozxc");
+        User user = userMapper.selectOne(userLambdaQueryWrapper);
+        System.out.println(user);
+        System.out.println("=====================");
+
+        String pwd = passwordEncoder.encode("123456");
+        System.out.println("passwordEncoder.encode(\"123456\") = " + pwd);
+        user.setPassword(pwd);
+        System.out.println(user);
+        System.out.println("----------------------");
+        Claims claims = JwtUtil.parseJWT(JwtUtil.createJWT(user.toString()));
+
+        System.out.println("```````````````````````````````````````");
+        System.out.println(claims.getSubject());
+        System.out.println("```````````````````````````````````````");
+
+        userMapper.updateById(user);
+        System.out.println(passwordEncoder.matches("123456", user.getPassword()));
     }
 
 }
