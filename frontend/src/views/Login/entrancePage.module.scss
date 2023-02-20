@@ -79,6 +79,10 @@ $register-border-bottom-color: var(--register-border-bottom-color, white);
 
       .registerForm {
         margin: 35px 0 0 0;
+
+        .getPassCode {
+          margin-left: 15px;
+        }
       }
     }
   }

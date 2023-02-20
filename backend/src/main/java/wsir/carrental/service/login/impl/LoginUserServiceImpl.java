@@ -6,13 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import wsir.carrental.entity.User;
 import wsir.carrental.entity.login.LoginUser;
 import wsir.carrental.mapper.UserMapper;
 import wsir.carrental.service.login.LoginUserService;
 import wsir.carrental.util.JwtUtil;
-import wsir.carrental.util.Result;
 
 import java.util.Map;
 
@@ -22,10 +22,16 @@ public class LoginUserServiceImpl implements LoginUserService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Override
-    public Map<String, String> login(User user) {
+    public Map<String, Object> login(User user) {
         //  通过email登录用户
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getEmail, user.getUserName());
@@ -44,9 +50,30 @@ public class LoginUserServiceImpl implements LoginUserService {
         // 认证通过，使用userId生成jwt
         LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
         String userId = loginUser.getUser().getId();
-        String jwt = JwtUtil.createJWT(userId);
-        Map<String, String> map = Map.of("token", jwt, "userPrincipal", authenticate.getPrincipal().toString());
+        String jwt = jwtUtil.createJWT(userId);
+        return Map.of("user_token", jwt, "userPrincipal", loginUser);
+    }
 
-        return map;
+    @Override
+    public Integer register(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userMapper.insert(user);
+    }
+
+    @Override
+    public Integer chgPwd(User user) {
+        User oldUser = this.selectUserByEmailOrName(user);
+        if (ObjectUtil.isNull(oldUser)) {
+            throw new RuntimeException("该用户不存在");
+        }
+        oldUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userMapper.updateById(oldUser);
+    }
+
+    @Override
+    public User selectUserByEmailOrName(User user) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getEmail, user.getEmail()).or().eq(User::getUserName, user.getUserName());
+        return userMapper.selectOne(wrapper);
     }
 }

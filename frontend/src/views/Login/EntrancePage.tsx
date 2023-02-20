@@ -1,32 +1,80 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Checkbox, Form, Image, Input, Modal, Space} from 'antd';
+import React, {useState} from 'react';
+import {Button, Form, Input, message, Modal, Space} from 'antd';
+import request from '../../api/request';
 import styles from './entrancePage.module.scss';
 import entranceTitle from '../../assets/entranceTitle.png';
+import result from "../../types/axios";
+import {useNavigate} from "react-router-dom";
 
 const EntrancePage: React.FC = () => {
-    const [loginForm] = Form.useForm();
-    const [registerForm] = Form.useForm();
+    const navigate = useNavigate();
+
+    const [loginOrRegisterForm] = Form.useForm();
+    // const [resetPwdForm] = Form.useForm();
 
     const [isLogin, setIsLogin] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const onFinish = (values: any) => {
-        console.log('Success:', values);
+    const toLogin = async (values: any) => {
+        const res: result = await request.post('/user/login', values);
+        if (res.code !== 200) {
+            message.error(res.msg);
+            return;
+        }
+        const user = JSON.parse(JSON.stringify(res.data));
+        localStorage.setItem("user_info", JSON.stringify(user.userPrincipal));
+        localStorage.setItem("user_token", user.user_token);
+
+        message.success("登陆成功！");
+        loginOrRegisterForm.resetFields();
+        navigate("/Home");
+    }
+
+    const toRegister = async (values: any) => {
+        const res: result = await request.post('/user/register', values);
+        if (res.code !== 200) {
+            message.error(res.msg);
+            return;
+        }
+
+        message.success("注册成功！");
+        loginOrRegisterForm.resetFields();
+        turnToLogin();
     };
 
-    const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
+    const toResetPwd = async (values: any) => {
+        const res: result = await request.post('/user/chgPwd', values);
+        if (res.code !== 200) {
+            message.error(res.msg);
+            return;
+        }
+
+        message.success("修改密码成功！");
+        handleCancel();
+    };
+
+    const getPassCode = async () => {
+        const email: string = loginOrRegisterForm.getFieldValue('email');
+        if (email === undefined) {
+            return;
+        }
+
+        const res: result = await request.get('/mail/sendPassCode/' + email);
+        if (res.code !== 200) {
+            message.error(res.msg);
+            return;
+        }
+
+        message.success("发送验证码成功！");
     };
 
     const showModal = () => {
+        loginOrRegisterForm.resetFields();
         setIsModalOpen(true);
     };
 
-    const handleOk = () => {
-        setIsModalOpen(false);
-    };
-
     const handleCancel = () => {
+        loginOrRegisterForm.resetFields();
         setIsModalOpen(false);
     };
 
@@ -36,6 +84,7 @@ const EntrancePage: React.FC = () => {
         document.getElementsByTagName('body')[0].style.setProperty('--register-font-weight', "normal");
         document.getElementsByTagName('body')[0].style.setProperty('--login-border-bottom-color', "red");
         document.getElementsByTagName('body')[0].style.setProperty('--register-border-bottom-color', "white");
+        loginOrRegisterForm.resetFields();
     }
 
     const turnToRegister = () => {
@@ -44,11 +93,8 @@ const EntrancePage: React.FC = () => {
         document.getElementsByTagName('body')[0].style.setProperty('--register-font-weight', "bold");
         document.getElementsByTagName('body')[0].style.setProperty('--login-border-bottom-color', "white");
         document.getElementsByTagName('body')[0].style.setProperty('--register-border-bottom-color', "red");
+        loginOrRegisterForm.resetFields();
     }
-
-    useEffect(() => {
-        console.log("qwer: " + isLogin);
-    }, [isLogin]);
 
     return (
         <div className={styles.entrancePage}>
@@ -63,24 +109,23 @@ const EntrancePage: React.FC = () => {
                         <div className={styles.login}>
                             <div className={styles.loginForm}>
                                 <Form
-                                    form={loginForm}
-                                    name="loginForm"
+                                    form={loginOrRegisterForm}
+                                    name="loginOrRegisterForm"
                                     requiredMark={false}
                                     labelCol={{ span: 2 }}
                                     wrapperCol={{ span: 20 }}
                                     style={{ maxWidth: 600 }}
                                     initialValues={{ remember: true }}
-                                    onFinish={onFinish}
-                                    onFinishFailed={onFinishFailed}
+                                    onFinish={toLogin}
                                     autoComplete="off"
                                 >
                                     <Form.Item
                                         label=" "
                                         colon={false}
-                                        name="username"
+                                        name="userName"
                                         rules={[{ required: true, message: 'Please input your username!' }]}
                                     >
-                                        <Input className={styles.zxc} placeholder={"请输入用户名"} />
+                                        <Input placeholder={"请输入用户名"} />
                                     </Form.Item>
 
                                     <Form.Item
@@ -111,21 +156,20 @@ const EntrancePage: React.FC = () => {
                         <div className={styles.register}>
                             <div className={styles.registerForm}>
                                 <Form
-                                    form={registerForm}
-                                    name="registerForm"
+                                    form={loginOrRegisterForm}
+                                    name="loginOrRegisterForm"
                                     requiredMark={false}
                                     labelCol={{ span: 2 }}
                                     wrapperCol={{ span: 20 }}
                                     style={{ maxWidth: 600 }}
                                     initialValues={{ remember: true }}
-                                    onFinish={onFinish}
-                                    onFinishFailed={onFinishFailed}
+                                    onFinish={toRegister}
                                     autoComplete="off"
                                 >
                                     <Form.Item
                                         label=" "
                                         colon={false}
-                                        name="username"
+                                        name="email"
                                         rules={[{ required: true, message: 'Please input your username!' }]}
                                     >
                                         <Input placeholder={"邮箱"} />
@@ -134,7 +178,7 @@ const EntrancePage: React.FC = () => {
                                     <Form.Item
                                         label=" "
                                         colon={false}
-                                        name="username"
+                                        name="userName"
                                         rules={[{ required: true, message: 'Please input your username!' }]}
                                     >
                                         <Input placeholder={"用户名"} />
@@ -152,7 +196,7 @@ const EntrancePage: React.FC = () => {
                                     <Form.Item
                                         label=" "
                                         colon={false}
-                                        name="password"
+                                        name="checkPassword"
                                         rules={[{ required: true, message: 'Please input your password!' }]}
                                     >
                                         <Input.Password placeholder={"确认密码"} />
@@ -161,12 +205,12 @@ const EntrancePage: React.FC = () => {
                                     <Form.Item
                                         label=" "
                                         colon={false}
-                                        name="username"
+                                        name="passCode"
                                         rules={[{ required: true, message: 'Please input your username!' }]}
                                     >
                                         <Space>
-                                            <Input placeholder={"用户名"} />
-                                            <Button htmlType="button">
+                                            <Input placeholder={"验证码"} />
+                                            <Button htmlType="button" className={styles.getPassCode} onClick={getPassCode}>
                                                 获取验证码
                                             </Button>
                                         </Space>
@@ -189,10 +233,72 @@ const EntrancePage: React.FC = () => {
                 }
 
                 <div>
-                    <Modal title="Find Forget Password" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
-                        <p>Some contents...</p>
+                    <Modal width={400} centered title="通过邮箱找回密码" open={isModalOpen} onCancel={handleCancel} footer={false}>
+                        <div className={styles.resetPwdForm}>
+                            <Form
+                                form={loginOrRegisterForm}
+                                name="loginOrRegisterForm"
+                                requiredMark={false}
+                                labelCol={{ span: 2 }}
+                                wrapperCol={{ span: 20 }}
+                                style={{ maxWidth: 600 }}
+                                initialValues={{ remember: true }}
+                                onFinish={toResetPwd}
+                                autoComplete="off"
+                            >
+                                <Form.Item
+                                    label=" "
+                                    colon={false}
+                                    name="email"
+                                    rules={[{ required: true, message: 'Please input your username!' }]}
+                                >
+                                    <Input placeholder={"邮箱"} />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label=" "
+                                    colon={false}
+                                    name="password"
+                                    rules={[{ required: true, message: 'Please input your password!' }]}
+                                >
+                                    <Input.Password placeholder={"密码"} />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label=" "
+                                    colon={false}
+                                    name="checkPassword"
+                                    rules={[{ required: true, message: 'Please input your password!' }]}
+                                >
+                                    <Input.Password placeholder={"确认密码"} />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label=" "
+                                    colon={false}
+                                    name="passCode"
+                                    rules={[{ required: true, message: 'Please input your username!' }]}
+                                >
+                                    <Space>
+                                        <Input placeholder={"验证码"} />
+                                        <Button htmlType="button" className={styles.getPassCode} onClick={getPassCode}>
+                                            获取验证码
+                                        </Button>
+                                    </Space>
+                                </Form.Item>
+
+                                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                                    <Space>
+                                        <Button type="primary" htmlType="submit">
+                                            重置
+                                        </Button>
+                                        <Button htmlType="reset">
+                                            清空
+                                        </Button>
+                                    </Space>
+                                </Form.Item>
+                            </Form>
+                        </div>
                     </Modal>
                 </div>
             </div>

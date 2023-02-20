@@ -35,7 +35,7 @@ public class SpringSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/user/login").anonymous()
+                .antMatchers("/user/**", "/mail/sendPassCode/**").anonymous()
                 .anyRequest().authenticated()
                 .and()
                 .build();

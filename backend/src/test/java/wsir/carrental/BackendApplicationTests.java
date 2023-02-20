@@ -26,6 +26,9 @@ class BackendApplicationTests {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Test
     void contextLoads() {
         User user = new User();
@@ -73,7 +76,7 @@ class BackendApplicationTests {
         user.setPassword(pwd);
         System.out.println(user);
         System.out.println("----------------------");
-        Claims claims = JwtUtil.parseJWT(JwtUtil.createJWT(user.toString()));
+        Claims claims = jwtUtil.parseJWT(jwtUtil.createJWT(user.toString()));
 
         System.out.println("```````````````````````````````````````");
         System.out.println(claims.getSubject());

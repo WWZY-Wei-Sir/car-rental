@@ -15,7 +15,7 @@ const loadingElement = (element: JSX.Element) => (
 const routes: object[] = [
     {
         path: "/",
-        element: <Navigate to={"/Home"}/>
+        element: <Navigate to={"/entrance"}/>
     },
     {
         path: "/entrance",
@@ -35,7 +35,7 @@ const routes: object[] = [
     },
     {
         path: "/*",
-        element: <Navigate to={"/404"}/>
+        element: <Navigate to={"/entrance"}/>
     }
 ];
 
