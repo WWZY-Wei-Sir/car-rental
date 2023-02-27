@@ -1,5 +1,6 @@
 package wsir.carrental;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,6 +13,8 @@ import wsir.carrental.dict.UserStatus;
 import wsir.carrental.dict.UserType;
 import wsir.carrental.entity.User;
 import wsir.carrental.mapper.UserMapper;
+import wsir.carrental.service.UserService;
+import wsir.carrental.service.impl.UserServiceImpl;
 import wsir.carrental.util.JwtUtil;
 
 import java.util.List;
@@ -22,6 +25,9 @@ class BackendApplicationTests {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -86,4 +92,14 @@ class BackendApplicationTests {
         System.out.println(passwordEncoder.matches("123456", user.getPassword()));
     }
 
+    @Test
+    void test4() {
+        User user = new User();
+        user.setEmail("321");
+        user.setUserName("hello");
+        user.setUserType(UserType.Admin);
+
+//        IPage<User> pages = userServiceImpl.getPages(user);
+//        System.out.println(pages);
+    }
 }

@@ -3,5 +3,5 @@ export default interface result {
     success: boolean;
     code: number;
     msg: string;
-    data: object;
+    data: any;
 }

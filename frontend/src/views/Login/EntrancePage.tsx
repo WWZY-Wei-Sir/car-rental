@@ -9,8 +9,7 @@ import {useNavigate} from "react-router-dom";
 const EntrancePage: React.FC = () => {
     const navigate = useNavigate();
 
-    const [loginOrRegisterForm] = Form.useForm();
-    // const [resetPwdForm] = Form.useForm();
+    const [entranceForm] = Form.useForm();
 
     const [isLogin, setIsLogin] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,7 +25,7 @@ const EntrancePage: React.FC = () => {
         localStorage.setItem("user_token", user.user_token);
 
         message.success("登陆成功！");
-        loginOrRegisterForm.resetFields();
+        entranceForm.resetFields();
         navigate("/Home");
     }
 
@@ -38,7 +37,7 @@ const EntrancePage: React.FC = () => {
         }
 
         message.success("注册成功！");
-        loginOrRegisterForm.resetFields();
+        entranceForm.resetFields();
         turnToLogin();
     };
 
@@ -54,12 +53,16 @@ const EntrancePage: React.FC = () => {
     };
 
     const getPassCode = async () => {
-        const email: string = loginOrRegisterForm.getFieldValue('email');
+        const email: string = entranceForm.getFieldValue('email');
         if (email === undefined) {
             return;
         }
 
-        const res: result = await request.get('/mail/sendPassCode/' + email);
+        const res: result = await request.get('/mail/sendPassCode', {
+            params: {
+                mailbox: email
+            }
+        });
         if (res.code !== 200) {
             message.error(res.msg);
             return;
@@ -69,12 +72,12 @@ const EntrancePage: React.FC = () => {
     };
 
     const showModal = () => {
-        loginOrRegisterForm.resetFields();
+        entranceForm.resetFields();
         setIsModalOpen(true);
     };
 
     const handleCancel = () => {
-        loginOrRegisterForm.resetFields();
+        entranceForm.resetFields();
         setIsModalOpen(false);
     };
 
@@ -84,7 +87,7 @@ const EntrancePage: React.FC = () => {
         document.getElementsByTagName('body')[0].style.setProperty('--register-font-weight', "normal");
         document.getElementsByTagName('body')[0].style.setProperty('--login-border-bottom-color', "red");
         document.getElementsByTagName('body')[0].style.setProperty('--register-border-bottom-color', "white");
-        loginOrRegisterForm.resetFields();
+        entranceForm.resetFields();
     }
 
     const turnToRegister = () => {
@@ -93,7 +96,7 @@ const EntrancePage: React.FC = () => {
         document.getElementsByTagName('body')[0].style.setProperty('--register-font-weight', "bold");
         document.getElementsByTagName('body')[0].style.setProperty('--login-border-bottom-color', "white");
         document.getElementsByTagName('body')[0].style.setProperty('--register-border-bottom-color', "red");
-        loginOrRegisterForm.resetFields();
+        entranceForm.resetFields();
     }
 
     return (
@@ -109,8 +112,8 @@ const EntrancePage: React.FC = () => {
                         <div className={styles.login}>
                             <div className={styles.loginForm}>
                                 <Form
-                                    form={loginOrRegisterForm}
-                                    name="loginOrRegisterForm"
+                                    form={entranceForm}
+                                    name="entranceForm"
                                     requiredMark={false}
                                     labelCol={{ span: 2 }}
                                     wrapperCol={{ span: 20 }}
@@ -156,8 +159,8 @@ const EntrancePage: React.FC = () => {
                         <div className={styles.register}>
                             <div className={styles.registerForm}>
                                 <Form
-                                    form={loginOrRegisterForm}
-                                    name="loginOrRegisterForm"
+                                    form={entranceForm}
+                                    name="entranceForm"
                                     requiredMark={false}
                                     labelCol={{ span: 2 }}
                                     wrapperCol={{ span: 20 }}
@@ -236,8 +239,8 @@ const EntrancePage: React.FC = () => {
                     <Modal width={400} centered title="通过邮箱找回密码" open={isModalOpen} onCancel={handleCancel} footer={false}>
                         <div className={styles.resetPwdForm}>
                             <Form
-                                form={loginOrRegisterForm}
-                                name="loginOrRegisterForm"
+                                form={entranceForm}
+                                name="entranceForm"
                                 requiredMark={false}
                                 labelCol={{ span: 2 }}
                                 wrapperCol={{ span: 20 }}

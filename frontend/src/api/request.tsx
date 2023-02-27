@@ -3,11 +3,7 @@ import { message } from 'antd';
 
 const request = axios.create({
     baseURL: "http://localhost:8090",
-    timeout: 5000,
-    headers: {
-        Accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
+    timeout: 10000
 });
 
 // axios实例拦截响应
@@ -55,10 +51,14 @@ request.interceptors.request.use(
     (config) => {
         config.headers["Content-Type"] = "application/json;charset=utf-8";
 
-        const user_token = localStorage.getItem('user_token') ?
-            JSON.parse(localStorage.getItem('user_token') || '') : null;
+        const user_token = localStorage.getItem('user_token');
+        const user_info = localStorage.getItem('user_info');
         if (user_token) {
             config.headers["user_token"] = user_token;
+        }
+
+        if (user_info) {
+            config.headers["user_info"] = JSON.parse(JSON.stringify(user_info));
         }
 
         return config;

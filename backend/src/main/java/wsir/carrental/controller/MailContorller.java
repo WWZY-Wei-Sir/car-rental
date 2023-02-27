@@ -19,8 +19,8 @@ public class MailContorller {
     private RedisUtil redisUtil;
 
     // sendVerificationCode发送验证码
-    @GetMapping("/sendPassCode/{mailbox}")
-    public <T> Result<T> sendPassCode(@PathVariable String mailbox) {
+    @GetMapping("/sendPassCode")
+    public <T> Result<T> sendPassCode(@RequestParam String mailbox) {
         if (StrUtil.isBlank(mailbox)) {
             return Result.error(HttpURLConnection.HTTP_NOT_ACCEPTABLE, "请求的邮箱为空!");
         }

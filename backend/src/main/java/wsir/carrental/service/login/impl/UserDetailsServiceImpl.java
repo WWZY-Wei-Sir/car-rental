@@ -11,6 +11,8 @@ import wsir.carrental.entity.User;
 import wsir.carrental.entity.login.LoginUser;
 import wsir.carrental.mapper.UserMapper;
 
+import java.util.List;
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
@@ -26,6 +28,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new RuntimeException("用户名或密码错误");
         }
 
-        return new LoginUser(user);
+        LoginUser loginUser = new LoginUser();
+        loginUser.setUser(user);
+        loginUser.setPermissions(List.of("test"));
+        return loginUser;
     }
 }

@@ -5,6 +5,7 @@ const EntrancePage = lazy(() => import("../views/Login/EntrancePage"));
 const Test = lazy(() => import("../views/Test"));
 const Home = lazy(() => import("../views/Home"));
 const Error = lazy(() => import("../views/Error"));
+const UserManager = lazy(() => import("../views/UserManager"));
 
 const loadingElement = (element: JSX.Element) => (
     <React.Suspense fallback={<div>loding...</div>}>
@@ -14,20 +15,26 @@ const loadingElement = (element: JSX.Element) => (
 
 const routes: object[] = [
     {
-        path: "/",
-        element: <Navigate to={"/entrance"}/>
-    },
-    {
         path: "/entrance",
         element: loadingElement(<EntrancePage />)
     },
     {
-        path: "/Home",
-        element: loadingElement(<Home />)
+        path: "/",
+        element: <Navigate to={"/Test"}/>
     },
     {
-        path: "/Test",
-        element: loadingElement(<Test />)
+        path: "/",
+        element: <Home />,
+        children: [
+            {
+                path: "/Test",
+                element: loadingElement(<Test />)
+            },
+            {
+                path: "/userManager",
+                element: loadingElement(<UserManager />)
+            }
+        ]
     },
     {
         path: "/404",
@@ -35,7 +42,7 @@ const routes: object[] = [
     },
     {
         path: "/*",
-        element: <Navigate to={"/entrance"}/>
+        element: <Navigate to={"/Test"}/>
     }
 ];
 

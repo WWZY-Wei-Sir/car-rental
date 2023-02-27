@@ -8,10 +8,11 @@ const BeforeRouterEnter = () => {
 
     const location = useLocation();
     const user_token = localStorage.getItem('user_token');
-    if (location.pathname === "/entrance" && user_token) {
+    const user_info = localStorage.getItem('user_info');
+    if (location.pathname === "/entrance" && user_token && user_info) {
         return <Home />;
     }
-    if (location.pathname !== "/entrance" && !user_token) {
+    if (location.pathname !== "/entrance" && !(user_token && user_info)) {
         return <EntrancePage />;
     }
 

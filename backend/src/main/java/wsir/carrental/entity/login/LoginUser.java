@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import wsir.carrental.entity.User;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -15,9 +18,24 @@ import java.util.Collection;
 public class LoginUser implements UserDetails {
     private User user;
 
+    //存储权限信息
+    private List<String> permissions;
+
+    //存储SpringSecurity所需要的权限信息的集合
+//    @JSONField(serialize = false)
+    private List<GrantedAuthority> authorities;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        if (authorities != null){
+            return authorities;
+        }
+
+        //把permissions中字符串类型的权限信息转换成GrantedAuthority对象存入authorities中
+        authorities = permissions.stream().
+                map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+        return authorities;
     }
 
     @Override

@@ -1,77 +1,55 @@
 package wsir.carrental.controller;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import wsir.carrental.service.MailService;
-import wsir.carrental.service.login.LoginUserService;
-import wsir.carrental.util.RedisUtil;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import wsir.carrental.dict.UserStatus;
+import wsir.carrental.dict.UserType;
+import wsir.carrental.entity.User;
+import wsir.carrental.service.UserService;
 import wsir.carrental.util.Result;
 import wsir.carrental.vo.UserVo;
 
 import java.net.HttpURLConnection;
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/userManager")
 public class UserController {
     @Autowired
-    private RedisUtil redisUtil;
+    private UserService userService;
 
-    @Autowired
-    private LoginUserService loginUserService;
-
-    @Autowired
-    private MailService mailService;
-
-    @PostMapping("/login")
-    public Result<Map<String, Object>> login(@RequestBody UserVo userVo) {
-        return Result.success(loginUserService.login(userVo));
+    @GetMapping("/getPages")
+    @PreAuthorize("hasAuthority('test')")
+    public Result<Map<String, Object>> getPages(@RequestParam String email) {
+//        IPage<User> pages = userService.getPages(email, userName, telephone, status, userType, createTimeFirst, createTimeLast, current, size);
+//        return Result.success(Map.of("total", pages.getTotal(), "data", pages));
+        return Result.success();
     }
 
-    @PostMapping("/register")
-    public <T> Result<T> register(@RequestBody UserVo userVo) {
-        // 判断验证码是否合理
-        switch (mailService.checkPassCode(userVo.getEmail(), userVo.getPassCode())) {
-            case 0:
-                return Result.error(HttpURLConnection.HTTP_NOT_ACCEPTABLE, "验证码已过期");
-            case 1:
-                return Result.error(HttpURLConnection.HTTP_NOT_ACCEPTABLE, "验证码错误");
-        }
-
-        //  已存在该用户
-        if (ObjectUtil.isNotNull(loginUserService.selectUserByEmailOrName(userVo))) {
-            return Result.error(HttpURLConnection.HTTP_CONFLICT, "用户已经被注册");
-        }
-
-        // 注册账号
-        if (1 == loginUserService.register(userVo)) {
-            redisUtil.expire(userVo.getEmail(), -2);
+    @PostMapping("/insertOne")
+    public <T> Result<T> insertWorkerOrAdmin(@RequestBody UserVo userVo) {
+        if (userService.insertWorkerOrAdmin(userVo) > 0) {
             return Result.success();
-        } else {
-            return Result.error(HttpURLConnection.HTTP_NOT_ACCEPTABLE, "注册失败");
         }
+        return Result.error(HttpURLConnection.HTTP_PAYMENT_REQUIRED, "添加员工或管理员失败！");
     }
 
-    @PostMapping("/chgPwd")
-    public <T> Result<T> chgPwd(@RequestBody UserVo userVo) {
-        // 判断验证码是否合理
-        switch (mailService.checkPassCode(userVo.getEmail(), userVo.getPassCode())) {
-            case 0:
-                return Result.error(HttpURLConnection.HTTP_NOT_ACCEPTABLE, "验证码已过期");
-            case 1:
-                return Result.error(HttpURLConnection.HTTP_NOT_ACCEPTABLE, "验证码错误");
-        }
-
-        // 修改密码
-        if (0 < loginUserService.chgPwd(userVo)) {
-            redisUtil.expire(userVo.getEmail(), -2);
+    @PostMapping("/delMore")
+    public <T> Result<T> deleteBatchWorkerOrAdmin(@RequestBody List<String> ids) {
+        if (userService.deleteBatchWorkerOrAdmin(ids) > 0) {
             return Result.success();
-        } else {
-            return Result.error(HttpURLConnection.HTTP_NOT_ACCEPTABLE, "修改密码失败");
         }
+        return Result.error(HttpURLConnection.HTTP_PAYMENT_REQUIRED, "批量删除员工或管理员失败！");
+    }
+
+    @PostMapping("/chgStatus")
+    public <T> Result<T> chgStatus(@RequestBody UserVo userVo) {
+        if (userService.chgStatus(userVo) > 0) {
+            return Result.success();
+        }
+        return Result.error(HttpURLConnection.HTTP_PAYMENT_REQUIRED, "更改用户状态失败！");
     }
 }
