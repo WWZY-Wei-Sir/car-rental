@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public abstract class LoginDelAndVerObject extends ByUserObject {
+public abstract class LogicDelAndVerObject extends ByUserObject {
     @TableLogic
     @TableField(fill = FieldFill.INSERT)
     private Boolean deleted;

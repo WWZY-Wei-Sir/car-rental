@@ -17,16 +17,20 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/userManager")
+@PreAuthorize("hasAuthority('userManager')")
 public class UserController {
     @Autowired
     private UserService userService;
 
     @GetMapping("/getPages")
-    @PreAuthorize("hasAuthority('test')")
-    public Result<Map<String, Object>> getPages(@RequestParam String email) {
-//        IPage<User> pages = userService.getPages(email, userName, telephone, status, userType, createTimeFirst, createTimeLast, current, size);
-//        return Result.success(Map.of("total", pages.getTotal(), "data", pages));
-        return Result.success();
+    public Result<Map<String, Object>> getPages(@RequestParam String email,
+                                                @RequestParam String userName,
+                                                @RequestParam UserStatus status,
+                                                @RequestParam UserType userType,
+                                                @RequestParam Long current,
+                                                @RequestParam Long size) {
+        IPage<User> pages = userService.getPages(email, userName, status, userType, current, size);
+        return Result.success(Map.of("total", pages.getTotal(), "page", pages));
     }
 
     @PostMapping("/insertOne")
@@ -45,9 +49,9 @@ public class UserController {
         return Result.error(HttpURLConnection.HTTP_PAYMENT_REQUIRED, "批量删除员工或管理员失败！");
     }
 
-    @PostMapping("/chgStatus")
-    public <T> Result<T> chgStatus(@RequestBody UserVo userVo) {
-        if (userService.chgStatus(userVo) > 0) {
+    @PostMapping("/chgUser")
+    public <T> Result<T> chgUser(@RequestBody UserVo userVo) {
+        if (userService.chgUser(userVo) > 0) {
             return Result.success();
         }
         return Result.error(HttpURLConnection.HTTP_PAYMENT_REQUIRED, "更改用户状态失败！");

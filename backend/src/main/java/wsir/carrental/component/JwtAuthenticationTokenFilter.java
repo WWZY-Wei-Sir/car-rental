@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import wsir.carrental.entity.User;
 import wsir.carrental.entity.login.LoginUser;
+import wsir.carrental.exception.ServiceException;
 import wsir.carrental.mapper.UserMapper;
 import wsir.carrental.util.JwtUtil;
 
@@ -18,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.List;
 
 @Component
@@ -29,14 +31,18 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     private UserMapper userMapper;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         //获取token
         String token = request.getHeader("user_token");
         LoginUser loginUser = JSON.parseObject(request.getHeader("user_info"), LoginUser.class);
-        System.out.println(loginUser);
+        System.out.println(token);
         if (StrUtil.isBlank(token)) {
             //放行
-            filterChain.doFilter(request, response);
+            try {
+                filterChain.doFilter(request, response);
+            } catch (Exception e) {
+                throw new ServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, "服务器放行错误");
+            }
             return;
         }
 
@@ -46,20 +52,25 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             Claims claims = jwtUtil.parseJWT(token);
             userId = claims.getSubject();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("token非法");
+            throw new ServiceException(HttpURLConnection.HTTP_UNAUTHORIZED, "token非法");
         }
         User user = userMapper.selectById(userId);
 
-        if (!user.equals(loginUser.getUser())) {
-            throw new RuntimeException("用户信息被篡改");
+        if (!(user.getId().equals(loginUser.getUser().getId())
+                && user.getEmail().equals(loginUser.getUser().getEmail())
+                && user.getUserName().equals(loginUser.getUser().getUserName()))) {
+            throw new ServiceException(HttpURLConnection.HTTP_UNAUTHORIZED, "用户信息被篡改");
         }
-        //存入SecurityContextHolder
-        //TODO 获取权限信息封装到Authentication中
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginUser,null, loginUser.getAuthorities());
+
+        //  存入SecurityContextHolder
+        //  获取权限信息封装到Authentication中
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser,null, loginUser.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         //放行
-        filterChain.doFilter(request, response);
+        try {
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            throw new ServiceException(HttpURLConnection.HTTP_INTERNAL_ERROR, "服务器放行错误");
+        }
     }
 }

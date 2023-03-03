@@ -9,14 +9,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import wsir.carrental.entity.User;
 import wsir.carrental.entity.login.LoginUser;
+import wsir.carrental.exception.ServiceException;
 import wsir.carrental.mapper.UserMapper;
+import wsir.carrental.mapper.UserMenuMapper;
 
+import java.net.HttpURLConnection;
 import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserMenuMapper userMenuMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -25,12 +31,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         User user = userMapper.selectOne(wrapper);
         if (ObjectUtil.isNull(user)) {
-            throw new RuntimeException("用户名或密码错误");
+            throw new ServiceException(HttpURLConnection.HTTP_CONFLICT, "用户名或密码错误");
         }
 
-        LoginUser loginUser = new LoginUser();
-        loginUser.setUser(user);
-        loginUser.setPermissions(List.of("test"));
-        return loginUser;
+//        user.setStatus(null);
+//        user.setUserType(null);
+        List<String> authentic =  userMenuMapper.getAuthenticByUser(user.getId());
+        return new LoginUser(user, authentic, null);
     }
 }

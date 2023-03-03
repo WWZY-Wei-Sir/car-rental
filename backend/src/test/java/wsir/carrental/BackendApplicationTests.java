@@ -1,6 +1,5 @@
 package wsir.carrental;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,12 +7,18 @@ import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import wsir.carrental.dict.UserStatus;
 import wsir.carrental.dict.UserType;
 import wsir.carrental.entity.User;
+import wsir.carrental.entity.authentication.RoleMenuTies;
+import wsir.carrental.entity.authentication.UserMenu;
+import wsir.carrental.entity.authentication.UserRole;
+import wsir.carrental.mapper.RoleMenuTiesMapper;
+import wsir.carrental.mapper.UserMenuMapper;
 import wsir.carrental.mapper.UserMapper;
-import wsir.carrental.service.UserService;
+import wsir.carrental.mapper.UserRoleMapper;
 import wsir.carrental.service.impl.UserServiceImpl;
 import wsir.carrental.util.JwtUtil;
 
@@ -25,6 +30,15 @@ class BackendApplicationTests {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserMenuMapper userMenuMapper;
+
+    @Autowired
+    private UserRoleMapper userRoleMapper;
+
+    @Autowired
+    private RoleMenuTiesMapper roleMenuTiesMapper;
 
     @Autowired
     private UserServiceImpl userServiceImpl;
@@ -39,7 +53,7 @@ class BackendApplicationTests {
     void contextLoads() {
         User user = new User();
         user.setEmail("qwer@12345678932asd31.com");
-        user.setStatus(UserStatus.Nromal);
+        user.setStatus(UserStatus.Normal);
         user.setUserType(UserType.Admin);
         user.setUserName("hello123");
         System.out.println(user.toString());
@@ -94,10 +108,27 @@ class BackendApplicationTests {
 
     @Test
     void test4() {
-        User user = new User();
-        user.setEmail("321");
-        user.setUserName("hello");
-        user.setUserType(UserType.Admin);
+//        User user = userMapper.selectById("2a52cb7b8941e12cbe6cd870fc3605c0");
+//        user.setUserName("CarRentalAdmin");
+//
+//        userMapper.updateById(user);
+//        System.out.println(userMapper.selectById(user.getId()));
+
+        System.out.println(UserStatus.valueOf("Block"));
+        System.out.println(UserStatus.getByMsg("qwer"));
+        System.out.println(UserStatus.getByMsg("正常"));
+
+
+//        System.out.println(userMenuMapper.getAuthenticByUser("2a52cb7b8941e12cbe6cd870fc3605c0"));
+//        UserRole userRole = new UserRole();
+//        userRole.setName("Admin");
+//        System.out.println(userRoleMapper.insert(userRole));
+//
+//        UserMenu userMenu = new UserMenu();
+//        userMenu.setName("userManager");
+//        userMenuMapper.insert(userMenu);
+//
+//        roleMenuTiesMapper.insert(new RoleMenuTies());
 
 //        IPage<User> pages = userServiceImpl.getPages(user);
 //        System.out.println(pages);

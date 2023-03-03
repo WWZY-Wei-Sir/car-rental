@@ -10,10 +10,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import wsir.carrental.entity.User;
 import wsir.carrental.entity.login.LoginUser;
+import wsir.carrental.exception.ServiceException;
 import wsir.carrental.mapper.UserMapper;
 import wsir.carrental.service.login.LoginUserService;
 import wsir.carrental.util.JwtUtil;
 
+import java.net.HttpURLConnection;
 import java.util.Map;
 
 @Service
@@ -44,7 +46,7 @@ public class LoginUserServiceImpl implements LoginUserService {
         Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
         if (ObjectUtil.isNull(authenticate)) {
-            throw new RuntimeException("登录失败");
+            throw new ServiceException(HttpURLConnection.HTTP_CONFLICT, "用户名或密码错误");
         }
 
         // 认证通过，使用userId生成jwt
@@ -64,7 +66,7 @@ public class LoginUserServiceImpl implements LoginUserService {
     public Integer chgPwd(User user) {
         User oldUser = this.selectUserByEmailOrName(user);
         if (ObjectUtil.isNull(oldUser)) {
-            throw new RuntimeException("该用户不存在");
+            throw new ServiceException(HttpURLConnection.HTTP_PROXY_AUTH, "该用户不存在");
         }
         oldUser.setPassword(passwordEncoder.encode(user.getPassword()));
         return userMapper.updateById(oldUser);

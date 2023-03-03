@@ -3,7 +3,7 @@ import {Button, Form, Input, message, Modal, Space} from 'antd';
 import request from '../../api/request';
 import styles from './entrancePage.module.scss';
 import entranceTitle from '../../assets/entranceTitle.png';
-import result from "../../types/axios";
+import {result} from "../../types/axios";
 import {useNavigate} from "react-router-dom";
 
 const EntrancePage: React.FC = () => {
@@ -16,15 +16,17 @@ const EntrancePage: React.FC = () => {
 
     const toLogin = async (values: any) => {
         const res: result = await request.post('/user/login', values);
+        console.log(res);
         if (res.code !== 200) {
-            message.error(res.msg);
+            message.error('邮箱/用户名或密码错误');
             return;
         }
         const user = JSON.parse(JSON.stringify(res.data));
+        user.userPrincipal.userStatus = null;
         localStorage.setItem("user_info", JSON.stringify(user.userPrincipal));
         localStorage.setItem("user_token", user.user_token);
 
-        message.success("登陆成功！");
+        message.success("登录成功！");
         entranceForm.resetFields();
         navigate("/Home");
     }

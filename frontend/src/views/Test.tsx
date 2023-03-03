@@ -1,18 +1,26 @@
 import React from 'react';
 // import './App.css';
 import {Button, message} from "antd";
-import result from "../types/axios";
+import {result} from "../types/axios";
 import request from "../api/request";
 
 const Test: React.FC = () => {
     const testFunction = async () => {
         const res: result = await request.get("/userManager/getPages", {
             params: {
-                email: ""
+                email: "",
+                userName: "",
+                telephone: "",
+                status: "",
+                userType: "Wrong",
+                createTimeFirst: "",
+                createTimeLast: "",
+                current: 1,
+                size: 10
             }
         });
 
-        console.log("qwer");
+        console.log("qwzcxxxxxxxxxxxxxxxxxxxxxxxxxxxxxer");
         let postForm = {
             userName: "321951493@qq.com",
             password: "123456"
@@ -23,6 +31,10 @@ const Test: React.FC = () => {
         //     return;
         // }
         console.log(res);
+        if (res.code !== 200) {
+            message.error('登录失败');
+            return;
+        }
     }
 
   return (

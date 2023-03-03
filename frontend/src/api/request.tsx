@@ -42,6 +42,8 @@ request.interceptors.response.use(
             return Promise.reject(response.data);
         } else {
             message.error('网络连接异常,请稍后再试!');
+            // localStorage.removeItem('user_token');
+            // localStorage.removeItem('user_info');
         }
     }
 );

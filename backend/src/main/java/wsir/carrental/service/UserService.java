@@ -8,12 +8,11 @@ import wsir.carrental.entity.User;
 import java.util.List;
 
 public interface UserService {
-    IPage<User> getPages(String email, String userName, String telephone, UserStatus status, UserType userType,
-                         String createTimeFirst, String createTimeLast, Long current, Long size);
+    IPage<User> getPages(String email, String userName, UserStatus status, UserType userType, Long current, Long size);
 
     Integer insertWorkerOrAdmin(User user);
 
     Integer deleteBatchWorkerOrAdmin(List<String> ids);
 
-    Integer chgStatus(User user);
+    Integer chgUser(User user);
 }

@@ -23,11 +23,8 @@ public class UserServiceImpl implements UserService {
 
     public IPage<User> getPages(String email,
                                 String userName,
-                                String telephone,
                                 UserStatus status,
                                 UserType userType,
-                                String createTimeFirst,
-                                String createTimeLast,
                                 Long current,
                                 Long size) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
@@ -37,21 +34,18 @@ public class UserServiceImpl implements UserService {
         if (!StrUtil.isBlank(userName)) {
             wrapper.like(User::getUserName, userName);
         }
-        if (!StrUtil.isBlank(telephone)) {
-            wrapper.like(User::getUserName, telephone);
-        }
-        if (!ObjectUtil.isNull(status)) {
+        if (!UserStatus.Wrong.equals(status)) {
             wrapper.eq(User::getStatus, status);
         }
-        if (!ObjectUtil.isNull(userType)) {
+        if (!UserType.Wrong.equals(userType)) {
             wrapper.eq(User::getUserType, userType);
         }
-        if (!StrUtil.isBlank(createTimeFirst)) {
-            wrapper.ge(User::getCreateTime, LocalDate.parse(createTimeFirst).atStartOfDay());
-        }
-        if (!StrUtil.isBlank(createTimeLast)) {
-            wrapper.le(User::getCreateTime, LocalDate.parse(createTimeLast).atStartOfDay());
-        }
+//        if (!StrUtil.isBlank(createTimeFirst)) {
+//            wrapper.ge(User::getCreateTime, LocalDate.parse(createTimeFirst).atStartOfDay());
+//        }
+//        if (!StrUtil.isBlank(createTimeLast)) {
+//            wrapper.le(User::getCreateTime, LocalDate.parse(createTimeLast).atStartOfDay());
+//        }
 
         Page<User> page = new Page<>(current, size);
         return userMapper.selectPage(page, wrapper);
@@ -68,7 +62,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Integer chgStatus(User user) {
+    public Integer chgUser(User user) {
         return userMapper.updateById(user);
     }
 }

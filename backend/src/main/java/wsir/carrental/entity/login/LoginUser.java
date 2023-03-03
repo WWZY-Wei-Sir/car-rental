@@ -1,5 +1,7 @@
 package wsir.carrental.entity.login;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,7 +24,7 @@ public class LoginUser implements UserDetails {
     private List<String> permissions;
 
     //存储SpringSecurity所需要的权限信息的集合
-//    @JSONField(serialize = false)
+    @JSONField(serialize = false)
     private List<GrantedAuthority> authorities;
 
     @Override
@@ -39,6 +41,7 @@ public class LoginUser implements UserDetails {
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public String getPassword() {
         return user.getPassword();
     }
